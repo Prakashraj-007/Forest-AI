@@ -1,0 +1,19 @@
+# Core Earth Engine & Geospatial
+earthengine-api>=1.7.42
+
+# API Server
+fastapi>=0.100.0
+uvicorn>=0.20.0
+pydantic>=2.0.0
+httpx>=0.23.0          # required by FastAPI TestClient
+
+# Scientific & Array Operations
+numpy>=1.24.0
+scikit-learn>=1.3.0    # Phase 2 Random Forest
+joblib>=1.3.0          # Phase 2 model serialization
+
+# Phase 3: Tree Detection (DeepForest / NEON AOP)
+# DeepForest installs torch, torchvision, opencv-python automatically
+deepforest>=1.3.3       # Pretrained RetinaNet tree-crown model (weecology/DeepForest)
+rasterio>=1.3.0         # GeoTIFF reading and CRS metadata
+pyproj>=3.5.0           # CRS reprojection (UTM -> WGS-84)

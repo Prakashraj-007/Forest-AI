@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forest AI — Biomass Estimation & Tree Detection Platform</title>
+  <meta name="description"
+    content="AI-Powered Forest Canopy Biomass Estimation and Individual Tree Crown Detection using Sentinel-1/2, Earth Engine, Leaflet, and DeepForest.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+
+<body class="dark-theme">
+  <div id="app" class="app-layout">
+    <!-- Top Navigation Bar -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m8 6 4-4 4 4"></path>
+            <path d="M12 2v10.3"></path>
+            <path d="m4 12 8-5 8 5"></path>
+            <path d="M12 11v8"></path>
+            <path d="M5 21h14"></path>
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <h1>Forest<span class="highlight">AI</span></h1>
+          <span class="sub-title">Global Canopy Biomass & Individual Tree Intelligence</span>
+        </div>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div class="mode-tabs">
+        <button id="mode-biomass-btn" class="mode-tab active" data-mode="biomass">
+          <span class="tab-icon">🌿</span>
+          <span class="tab-label">Biomass & Earth Engine</span>
+        </button>
+        <button id="mode-trees-btn" class="mode-tab" data-mode="trees">
+          <span class="tab-icon">🎯</span>
+          <span class="tab-label">High-Res Tree Detection</span>
+        </button>
+      </div>
+
+      <!-- System & Connection Status -->
+      <div class="header-status">
+        <div id="backend-status-pill" class="status-pill checking">
+          <span class="status-dot"></span>
+          <span id="backend-status-text">Connecting API...</span>
+        </div>
+        <div id="demo-mode-pill" class="status-pill demo-pill hidden">
+          <span>⚡ DEMO MODE</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace (Sidebar + Map) -->
+    <div class="workspace">
+      <!-- Left Sidebar Controls & Insights -->
+      <aside class="sidebar" id="sidebar">
+        <!-- Biomass Mode Panel (Default) -->
+        <div id="panel-biomass" class="mode-panel active">
+
+          <!-- STEP 1: Search & Navigation -->
+          <div class="panel-card glass">
+            <div class="card-header">
+              <h3><span class="card-num">01</span> Search Any Global Location</h3>
+              <span class="card-badge" id="search-status-badge">OpenStreetMap Nominatim</span>
+            </div>
+            <div class="card-body">
+              <div class="search-input-group">
+                <div class="search-field-wrapper">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" id="location-search-input"
+                    placeholder="Search any forest, national park, city or region..." class="input-dark search-box">
+                  <button id="btn-search-go" class="btn btn-primary btn-xs">Go</button>
+                </div>
+                <div id="search-feedback" class="search-msg hidden"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Draw AOI & Live Area Calculation -->
+          <div class="panel-card glass">
+            <div class="card-header">
+              <h3><span class="card-num">02</span> Define Area of Interest (AOI)</h3>
+              <span class="card-badge" id="aoi-type-badge">No AOI Selected</span>
+            </div>
+            <div class="card-body">
+              <div class="draw-tools-container">
+                <p class="draw-instruction">
+                  Draw a custom polygon on the map around your forest area of interest using the toolbar or buttons
+                  below.
+                </p>
+                <div class="draw-actions">
+                  <button id="btn-draw-polygon" class="btn btn-outline btn-sm">
+                    ✏️ Draw Polygon AOI
+                  </button>
+                  <button id="btn-edit-polygon" class="btn btn-secondary btn-sm hidden">
+                    📐 Edit Vertices
+                  </button>
+                  <button id="btn-clear-draw" class="btn btn-ghost btn-sm hidden">
+                    🗑️ Reset AOI
+                  </button>
+                </div>
+              </div>
+
+              <!-- Live Calculated AOI Metrics -->
+              <div class="metric-mini-grid" id="aoi-metrics">
+                <div class="mini-stat">
+                  <span class="label">Calculated Area</span>
+                  <span class="value" id="aoi-area-val">—</span>
+                </div>
+                <div class="mini-stat">
+                  <span class="label">Center Coordinates</span>
+                  <span class="value coords" id="aoi-center-val">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: Dynamic Satellite Layers -->
+          <div class="panel-card glass">
+            <div class="card-header">
+              <h3><span class="card-num">03</span> Dynamic Earth Engine Layers</h3>
+              <span class="card-badge">Live Map Overlay</span>
+            </div>
+            <div class="card-body">
+              <p class="satellite-desc">Toggle dynamic Earth Engine visualization layers for your active AOI:</p>
+              <div class="ee-layers-grid">
+                <label class="layer-radio-card">
+                  <input type="radio" name="ee-layer-select" value="none" checked>
+                  <span class="layer-card-content">
+                    <span class="layer-name">Base Map</span>
+                    <span class="layer-sub">Standard OSM / Satellite</span>
+                  </span>
+                </label>
+                <label class="layer-radio-card">
+                  <input type="radio" name="ee-layer-select" value="s2_rgb">
+                  <span class="layer-card-content">
+                    <span class="layer-name">Sentinel-2 RGB</span>
+                    <span class="layer-sub">True Color Composite (10m)</span>
+                  </span>
+                </label>
+                <label class="layer-radio-card">
+                  <input type="radio" name="ee-layer-select" value="s2_ndvi">
+                  <span class="layer-card-content">
+                    <span class="layer-name">Sentinel-2 NDVI</span>
+                    <span class="layer-sub">Vegetation Index (NIR/Red)</span>
+                  </span>
+                </label>
+                <label class="layer-radio-card">
+                  <input type="radio" name="ee-layer-select" value="s1_vv">
+                  <span class="layer-card-content">
+                    <span class="layer-name">Sentinel-1 VV</span>
+                    <span class="layer-sub">C-Band SAR Backscatter (dB)</span>
+                  </span>
+                </label>
+                <label class="layer-radio-card">
+                  <input type="radio" name="ee-layer-select" value="s1_vh">
+                  <span class="layer-card-content">
+                    <span class="layer-name">Sentinel-1 VH</span>
+                    <span class="layer-sub">Cross-Pol Canopy Scattering</span>
+                  </span>
+                </label>
+                <label class="layer-radio-card">
+                  <input type="radio" name="ee-layer-select" value="canopy_height">
+                  <span class="layer-card-content">
+                    <span class="layer-name">Canopy Height</span>
+                    <span class="layer-sub">ETH 10m Global Height Model</span>
+                  </span>
+                </label>
+                <label class="layer-radio-card">
+                  <input type="radio" name="ee-layer-select" value="biomass">
+                  <span class="layer-card-content">
+                    <span class="layer-name">Estimated Biomass</span>
+                    <span class="layer-sub">Global AGB Reference (Mg/ha)</span>
+                  </span>
+                </label>
+              </div>
+              <div id="ee-layer-status" class="ee-layer-status hidden"></div>
+            </div>
+          </div>
+
+          <!-- STEP 4: Execution & Dates -->
+          <div class="panel-card glass">
+            <div class="card-header">
+              <h3><span class="card-num">04</span> Biomass Estimation Model</h3>
+              <span class="card-badge">Sentinel 1/2 + RF</span>
+            </div>
+            <div class="card-body">
+              <div class="scientific-banner">
+                <span class="sci-icon">🔬</span>
+                <span><strong>Scientific Separation:</strong> Sentinel-1 + Sentinel-2 + ETH Canopy Height → Random
+                  Forest → Aboveground Biomass (Mg/ha). (Sentinel-1/2 do NOT count individual trees).</span>
+              </div>
+
+              <button id="btn-run-biomass" class="btn btn-primary btn-block">
+                <span class="btn-icon">⚡</span>
+                <span class="btn-text">Estimate Biomass for Selected Area</span>
+              </button>
+
+              <!-- Loading progress indicator -->
+              <div id="biomass-loading" class="loading-container hidden">
+                <div class="spinner"></div>
+                <div class="loading-status">
+                  <div class="status-title" id="loading-step-title">Processing Satellite Stack...</div>
+                  <div class="status-desc" id="loading-step-desc">Extracting Sentinel-1/2 & Canopy Height Features</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 5: Biomass Results Summary -->
+          <div class="panel-card glass" id="biomass-results-card">
+            <div class="card-header">
+              <h3><span class="card-num">05</span> Biomass & Carbon Stock Results</h3>
+              <span class="card-badge success" id="biomass-status-badge">Awaiting Execution</span>
+            </div>
+            <div class="card-body">
+              <div class="kpi-grid">
+                <div class="kpi-card highlight-emerald">
+                  <span class="kpi-label">Mean Aboveground Biomass</span>
+                  <div class="kpi-val-row">
+                    <span class="kpi-val" id="res-mean-biomass">—</span>
+                    <span class="kpi-unit">Mg / ha</span>
+                  </div>
+                  <span class="kpi-sub">Multi-Sensor Random Forest</span>
+                  <span class="kpi-note"
+                    style="font-size: 0.68rem; color: var(--text-muted); opacity: 0.85; margin-top: 4px; display: block;">Current
+                    AOI prediction — not a validation score.</span>
+                </div>
+
+                <div class="kpi-card">
+                  <span class="kpi-label">Total Estimated Biomass</span>
+                  <div class="kpi-val-row">
+                    <span class="kpi-val" id="res-total-biomass">—</span>
+                    <span class="kpi-unit">M tons</span>
+                  </div>
+                  <span class="kpi-sub" id="res-total-carbon">— Carbon Stock</span>
+                </div>
+              </div>
+
+              <div class="stat-rows">
+                <div class="stat-row">
+                  <span class="name">Biomass Min - Max</span>
+                  <span class="val" id="res-min-max">—</span>
+                </div>
+                <div class="stat-row">
+                  <span class="name">Standard Deviation</span>
+                  <span class="val" id="res-std">—</span>
+                </div>
+                <div class="stat-row">
+                  <span class="name">Overall Model Validation (R²)</span>
+                  <span class="val" id="res-r2">—</span>
+                </div>
+                <div class="stat-row">
+                  <span class="name">Canopy Height (ETH 10m)</span>
+                  <span class="val" id="res-height">—</span>
+                </div>
+              </div>
+
+              <!-- Scientific Disclaimer Box (Arid / Desert ecosystem notice) -->
+              <div id="biome-disclaimer-box" class="disclaimer-banner alert-warning hidden" style="margin-top: 12px;">
+                <div class="alert-icon">🌵</div>
+                <div class="alert-content">
+                  <strong id="biome-disclaimer-title">Arid / Desert Ecosystem Detected</strong>
+                  <p id="biome-disclaimer-text" style="font-size: 0.72rem; line-height: 1.35; margin-top: 4px;"></p>
+                </div>
+              </div>
+
+              <!-- Per-Biome Model Validation Metrics Table -->
+              <div id="per-biome-metrics-container" class="feature-importance-section hidden" style="margin-top: 14px;">
+                <h4>Multi-Biome Model v2 Performance Metrics (NASA/ORNL)</h4>
+                <div id="per-biome-metrics-list" style="font-size: 0.7rem; color: var(--text-muted);">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+              <!-- Feature Importance Bars -->
+              <div class="feature-importance-section">
+                <h4>Top Multi-Sensor Feature Importance</h4>
+                <div id="feature-importance-list" class="feature-bars">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tree Crown Detection Mode Panel -->
+        <div id="panel-trees" class="mode-panel">
+          <!-- Scientific Boundary Note -->
+          <div class="scientific-banner tree-banner">
+            <span class="sci-icon">🌲</span>
+            <div>
+              <strong>Individual Tree Crown Detection Architecture</strong>
+              <p>Individual tree crowns require <strong>sub-meter high-resolution RGB imagery (&lt; 1m/px)</strong>
+                processed with the DeepForest RetinaNet neural network. Sentinel-1 &amp; 2 (10–20m) cannot resolve
+                individual tree crowns.</p>
+            </div>
+          </div>
+
+          <!-- Detection Options Tabs -->
+          <div class="tree-path-tabs">
+            <button id="tab-path-upload" class="tree-sub-tab active">
+              <span>📤 Upload GeoTIFF</span>
+            </button>
+            <button id="tab-path-provider" class="tree-sub-tab">
+              <span>🛰️ Imagery Provider</span>
+            </button>
+            <button id="tab-path-proxy" class="tree-sub-tab">
+              <span>🔬 NEON Proxy Demo</span>
+            </button>
+          </div>
+
+          <!-- PATH A: Upload High-Res GeoTIFF -->
+          <div id="section-path-upload" class="tree-path-section active">
+            <div class="panel-card glass">
+              <div class="card-header">
+                <h3><span class="card-num">A</span> Upload High-Resolution RGB GeoTIFF</h3>
+                <span class="card-badge">Custom Area</span>
+              </div>
+              <div class="card-body">
+                <p class="draw-instruction">
+                  Upload a real high-resolution aerial or drone GeoTIFF (.tif/.tiff) with embedded geospatial
+                  coordinates. DeepForest will detect tree crowns in your uploaded imagery.
+                </p>
+                <div class="upload-dropzone" id="upload-dropzone">
+                  <input type="file" id="geotiff-file-input" accept=".tif,.tiff,.geotiff" class="file-input-hidden">
+                  <div class="dropzone-content">
+                    <span class="upload-icon">📁</span>
+                    <span class="dropzone-title">Click to select or drag & drop GeoTIFF</span>
+                    <span class="dropzone-sub">Supported: GeoTIFF (.tif, .tiff) with RGB channels</span>
+                    <span id="selected-file-name" class="selected-file-name hidden"></span>
+                  </div>
+                </div>
+
+                <div class="slider-control">
+                  <div class="slider-label-row">
+                    <label for="upload-score-thresh">Confidence Threshold</label>
+                    <span id="upload-score-thresh-val" class="slider-value">0.15</span>
+                  </div>
+                  <input type="range" id="upload-score-thresh" min="0.05" max="0.80" step="0.05" value="0.15"
+                    class="slider-dark">
+                </div>
+
+                <button id="btn-upload-detect" class="btn btn-primary btn-block" disabled>
+                  <span class="btn-icon">🎯</span>
+                  <span class="btn-text">Run DeepForest on Uploaded GeoTIFF</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PATH B: Commercial Imagery Provider Search -->
+          <div id="section-path-provider" class="tree-path-section">
+            <div class="panel-card glass">
+              <div class="card-header">
+                <h3><span class="card-num">B</span> Commercial Imagery Provider API</h3>
+                <span class="card-badge">Commercial Integration</span>
+              </div>
+              <div class="card-body">
+                <p class="draw-instruction">
+                  Search commercial sub-meter satellite imagery for your current Area of Interest (AOI). Enter your API
+                  credentials to query the provider catalog.
+                </p>
+                <div class="provider-form">
+                  <div class="input-field">
+                    <label for="provider-select">Imagery Provider</label>
+                    <select id="provider-select" class="input-dark">
+                      <option value="planet">PlanetScope / SkySat (0.50m - 3m)</option>
+                      <option value="maxar">Maxar WorldView / Legion (0.30m)</option>
+                      <option value="airbus">Airbus Pléiades Neo (0.30m)</option>
+                    </select>
+                  </div>
+                  <div class="input-field">
+                    <label for="provider-api-key">Provider API Key / Token</label>
+                    <input type="password" id="provider-api-key" placeholder="Enter commercial API key..."
+                      class="input-dark">
+                  </div>
+                  <button id="btn-search-provider" class="btn btn-secondary btn-block">
+                    <span>🔍 Search Imagery for Current AOI</span>
+                  </button>
+                  <div id="provider-search-result" class="provider-feedback hidden"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PATH C: NEON Florida Proxy Demo -->
+          <div id="section-path-proxy" class="tree-path-section">
+            <div class="disclaimer-banner alert-warning">
+              <div class="alert-icon">⚠️</div>
+              <div class="alert-content">
+                <strong>EXPLICIT PROXY DEMO ONLY</strong>
+                <p>This demonstration runs DeepForest on real 0.10 m/pixel aerial RGB imagery from
+                  <strong>Ordway-Swisher Biological Station (OSBS), Florida, USA</strong> (NEON AOP). This is a
+                  technical pipeline demonstration and is <strong>never associated with your searched or drawn map
+                    location</strong>.</p>
+              </div>
+            </div>
+
+            <div class="panel-card glass">
+              <div class="card-header">
+                <h3><span class="card-num">C</span> NEON AOP Florida Proxy Demonstration</h3>
+                <span class="card-badge highlight-amber">Proxy Dataset</span>
+              </div>
+              <div class="card-body">
+                <div class="tile-meta-info">
+                  <div class="meta-row">
+                    <span>Dataset</span>
+                    <strong>NEON Airborne Observation Platform (AOP)</strong>
+                  </div>
+                  <div class="meta-row">
+                    <span>Site</span>
+                    <strong>Ordway-Swisher Biological Station, FL, USA</strong>
+                  </div>
+                  <div class="meta-row">
+                    <span>Resolution</span>
+                    <strong>0.10 m / pixel (10 cm GSD)</strong>
+                  </div>
+                  <div class="meta-row">
+                    <span>License</span>
+                    <strong>CC0 1.0 Universal (Public Domain)</strong>
+                  </div>
+                </div>
+
+                <div class="slider-control">
+                  <div class="slider-label-row">
+                    <label for="tree-score-thresh">Confidence Threshold</label>
+                    <span id="score-thresh-val" class="slider-value">0.15</span>
+                  </div>
+                  <input type="range" id="tree-score-thresh" min="0.05" max="0.80" step="0.05" value="0.15"
+                    class="slider-dark">
+                </div>
+
+                <button id="btn-run-tree-detection" class="btn btn-accent btn-block">
+                  <span class="btn-icon">🎯</span>
+                  <span class="btn-text">Run NEON Proxy Detection</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading Indicator for Tree Detection -->
+          <div id="trees-loading" class="loading-container hidden">
+            <div class="spinner"></div>
+            <div class="loading-status">
+              <div class="status-title" id="trees-loading-title">DeepForest RetinaNet Inference...</div>
+              <div class="status-desc" id="trees-loading-desc">Predicting tree crowns & geographic coordinates</div>
+            </div>
+          </div>
+
+          <!-- Tree Detection Results Card -->
+          <div class="panel-card glass" id="tree-results-card">
+            <div class="card-header">
+              <h3><span class="card-num">02</span> Tree Crown Detection Results</h3>
+              <span class="card-badge success" id="tree-count-badge">Awaiting Detection</span>
+            </div>
+            <div class="card-body">
+              <div class="kpi-grid">
+                <div class="kpi-card highlight-cyan">
+                  <span class="kpi-label">Detected Tree Crowns</span>
+                  <div class="kpi-val-row">
+                    <span class="kpi-val" id="res-tree-count">—</span>
+                    <span class="kpi-unit">trees</span>
+                  </div>
+                  <span class="kpi-sub">RetinaNet Individual Crowns</span>
+                </div>
+
+                <div class="kpi-card">
+                  <span class="kpi-label">Estimated Tree Density</span>
+                  <div class="kpi-val-row">
+                    <span class="kpi-val" id="res-tree-density">—</span>
+                    <span class="kpi-unit">trees / ha</span>
+                  </div>
+                  <span class="kpi-sub">Canopy Stand Density</span>
+                </div>
+              </div>
+
+              <div class="stat-rows">
+                <div class="stat-row">
+                  <span class="name">Mean Crown Area</span>
+                  <span class="val" id="res-tree-crown-area">—</span>
+                </div>
+                <div class="stat-row">
+                  <span class="name">Mean Confidence Score</span>
+                  <span class="val" id="res-tree-mean-score">—</span>
+                </div>
+                <div class="stat-row">
+                  <span class="name">Imagery Source</span>
+                  <span class="val coords" id="res-tree-source">—</span>
+                </div>
+              </div>
+
+              <div class="detection-options">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="chk-show-boxes" checked>
+                  <span>Show Individual Crown Polygons / Circles</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center & Right: Interactive Leaflet Map Canvas -->
+      <main class="map-container" id="map-container">
+        <div id="leaflet-map" class="map-view"></div>
+
+        <!-- Floating Map Controls (Top Right) -->
+        <div class="map-floating-controls top-right">
+          <div class="map-control-group glass">
+            <button id="btn-fly-neon" class="map-btn" title="View NEON Florida Proxy Demo Location">
+              🔬 NEON Proxy Demo
+            </button>
+            <button id="btn-reset-view" class="map-btn" title="Reset to Global Map View">
+              🌐 Global View
+            </button>
+          </div>
+        </div>
+
+        <!-- Floating Map Legend (Bottom Right) -->
+        <div class="map-legend glass" id="map-legend">
+          <div class="legend-header">
+            <span class="legend-title" id="legend-title">Biomass Density (Mg/ha)</span>
+            <button id="btn-toggle-legend" class="legend-collapse">▾</button>
+          </div>
+          <div class="legend-body" id="legend-body">
+            <div class="legend-gradient-bar" id="legend-gradient-bar"></div>
+            <div class="legend-ticks" id="legend-ticks">
+              <span>0</span>
+              <span>75</span>
+              <span>150</span>
+              <span>225</span>
+              <span>300+</span>
+            </div>
+            <div class="legend-items" id="legend-additional-items">
+              <div class="legend-item"><span class="swatch aoi-swatch"></span> Custom Drawn AOI (Turf.js)</div>
+              <div class="legend-item"><span class="swatch tree-swatch"></span> Detected Tree Crown (DeepForest)</div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>

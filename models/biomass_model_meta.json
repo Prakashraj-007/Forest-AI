@@ -1,0 +1,125 @@
+{
+  "model_type": "RandomForestRegressor",
+  "library": "scikit-learn",
+  "target_variable": "Aboveground Biomass (AGB)",
+  "unit": "Mg/ha",
+  "hyperparameters": {
+    "n_estimators": 200,
+    "max_depth": 16,
+    "min_samples_leaf": 2,
+    "random_state": 42,
+    "test_split_ratio": 0.2
+  },
+  "sample_statistics": {
+    "total_samples": 1000,
+    "training_samples": 800,
+    "validation_samples": 200,
+    "features_count": 16
+  },
+  "validation_metrics": {
+    "r2": 0.7653,
+    "rmse": 18.7125,
+    "mae": 12.6755,
+    "mean_actual_val": 63.27,
+    "mean_pred_val": 63.81
+  },
+  "feature_importance": [
+    {
+      "feature": "canopy_height",
+      "importance": 0.57,
+      "type": "structure_height",
+      "description": "ETH Global Canopy Height (10m) calibrated with GEDI LiDAR (meters)"
+    },
+    {
+      "feature": "B3",
+      "importance": 0.1732,
+      "type": "optical",
+      "description": "Green (560 nm) - Chlorophyll reflectance peak"
+    },
+    {
+      "feature": "B4",
+      "importance": 0.0707,
+      "type": "optical",
+      "description": "Red (665 nm) - Chlorophyll absorption band"
+    },
+    {
+      "feature": "B2",
+      "importance": 0.0276,
+      "type": "optical",
+      "description": "Blue (490 nm) - Atmospheric baseline and shadow differentiation"
+    },
+    {
+      "feature": "B12",
+      "importance": 0.0193,
+      "type": "optical",
+      "description": "SWIR-2 (2190 nm) - Lignin, cellulose, and moisture sensitivity"
+    },
+    {
+      "feature": "VH",
+      "importance": 0.0175,
+      "type": "radar_sar",
+      "description": "S1 C-band VH backscatter in dB - Volume scattering from branches, leaves, and canopy"
+    },
+    {
+      "feature": "NDWI",
+      "importance": 0.0148,
+      "type": "vegetation_index",
+      "description": "Normalized Difference Water Index (B8-B11)/(B8+B11) - Canopy moisture content"
+    },
+    {
+      "feature": "VV_VH_diff",
+      "importance": 0.0141,
+      "type": "radar_sar",
+      "description": "VV_dB - VH_dB backscatter difference (dB)"
+    },
+    {
+      "feature": "VV",
+      "importance": 0.014,
+      "type": "radar_sar",
+      "description": "S1 C-band VV backscatter in dB - Ground-trunk double bounce interaction"
+    },
+    {
+      "feature": "B8",
+      "importance": 0.0138,
+      "type": "optical",
+      "description": "NIR (842 nm) - Leaf cellular structure and high canopy scattering"
+    },
+    {
+      "feature": "VV_VH_ratio_lin",
+      "importance": 0.0133,
+      "type": "radar_sar",
+      "description": "Linear polarization ratio 10^((VV-VH)/10)"
+    },
+    {
+      "feature": "NDVI",
+      "importance": 0.0132,
+      "type": "vegetation_index",
+      "description": "Normalized Difference Veg Index (B8-B4)/(B8+B4) - Green canopy density"
+    },
+    {
+      "feature": "B11",
+      "importance": 0.0123,
+      "type": "optical",
+      "description": "SWIR-1 (1610 nm) - Canopy water absorption and dry biomass proxy"
+    },
+    {
+      "feature": "RVI",
+      "importance": 0.0121,
+      "type": "radar_sar",
+      "description": "Radar Vegetation Index: volume scattering fraction indicator"
+    },
+    {
+      "feature": "SAVI",
+      "importance": 0.0076,
+      "type": "vegetation_index",
+      "description": "Soil-Adjusted Veg Index - Minimizes soil background brightness effects"
+    },
+    {
+      "feature": "EVI",
+      "importance": 0.0066,
+      "type": "vegetation_index",
+      "description": "Enhanced Veg Index - Sensitive in high-biomass dense canopy without saturating"
+    }
+  ],
+  "quality_interpretation": "Strong regression fit (R\u00b2 = 0.765). The multi-sensor optical, radar, and canopy height features explain over 76.5% of aboveground biomass variance across Bandipur National Park (RMSE = 18.71 Mg/ha, MAE = 12.68 Mg/ha)."
+}

@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+*.dll
+venv/
+.venv/
+env/
+.env
+*.env
+
+# Model weights and large binary files
+*.joblib
+*.pt
+*.pth
+*.h5
+*.pkl
+*.ckpt
+lightning_logs/
+
+# GeoTIFF and data files
+*.tif
+*.tiff
+*.geotiff
+*.geojson
+*.csv
+outputs/
+data/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/dist
+.DS_Store
+
+# Secrets
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
