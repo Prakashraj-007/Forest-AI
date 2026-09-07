@@ -4,13 +4,6 @@
 
 This repository contains an end-to-end cloud and satellite remote sensing pipeline for estimating Aboveground Biomass (AGB in Mg/ha) and monitoring forest structure for **Bandipur National Park, Karnataka, India**.
 
----
-
-### Study Area: Bandipur National Park, Karnataka, India
-- **Bounding Box**: `[76.45°E, 11.60°N]` to `[76.80°E, 11.85°N]`
-- **Approximate Area**: ~750 km²
-- **GCP Project**: `forest-ai-507705`
-- **Forest Characteristics**: Dry deciduous, moist deciduous, and scrub forest eco-regions in the Western Ghats complex.
 
 ---
 
