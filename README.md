@@ -83,14 +83,6 @@ FastAPI Backend API Endpoints & CLI Verification Suite
 7. **`RVI`** (0.0167 / 1.7%): Dual-polarization Radar Vegetation Index.
 8. **`VV_VH_diff`** (0.0159 / 1.6%): Decibel difference ($VV_{dB} - VH_{dB}$).
 
-#### 5. Bandipur Area-Wide Biomass Statistics
-- **Minimum**: 22.09 Mg/ha
-- **Median**: 54.80 Mg/ha
-- **Mean**: **68.39 Mg/ha**
-- **Maximum**: 157.88 Mg/ha
-- **Standard Deviation**: 37.01 Mg/ha
-- **Output GeoTIFF**: `outputs/bandipur_biomass_prediction.tif` (EPSG:4326 georeferenced raster)
-
 ---
 
 ### Scientific Transparency & Limitations
