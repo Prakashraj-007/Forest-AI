@@ -75,7 +75,7 @@ export async function fetchTreeDetection(scoreThreshold = 0.15) {
   return handleResponse(res);
 }
 
-export async function uploadTreeDetection(file, scoreThreshold = 0.15, aoiGeometry = null) {
+export async function uploadTreeDetection(file, scoreThreshold = 0.15, aoiGeometry = null, mapBounds = null) {
   const formData = new FormData();
   formData.append('file', file);
   if (scoreThreshold != null) {
@@ -83,6 +83,11 @@ export async function uploadTreeDetection(file, scoreThreshold = 0.15, aoiGeomet
   }
   if (aoiGeometry) {
     formData.append('aoi_geojson', JSON.stringify(aoiGeometry));
+  }
+  // Pass current map viewport bounds so the backend can place detections at
+  // the correct geographic location for non-georeferenced images (e.g. screenshots).
+  if (mapBounds && mapBounds.length === 4) {
+    formData.append('map_bounds', JSON.stringify(mapBounds));
   }
   const res = await fetch(`${API_BASE}/api/v1/trees/detect/upload`, {
     method: 'POST',

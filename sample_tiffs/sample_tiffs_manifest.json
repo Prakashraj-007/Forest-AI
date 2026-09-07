@@ -1,0 +1,38 @@
+[
+  {
+    "filename": "florida_osbs_usa.tif",
+    "path": "C:\\myproject\\Biomass predict\\sample_tiffs\\florida_osbs_usa.tif",
+    "location": "Ordway-Swisher Biological Station, Florida, USA",
+    "coordinates": "29.689\u00b0 N, 81.993\u00b0 W",
+    "crs": "EPSG:32617 (UTM Zone 17N)",
+    "ecosystem": "Subtropical Longleaf Pine & Mixed Oak Woodland",
+    "file_size": "593.6 KB"
+  },
+  {
+    "filename": "yellowstone_conifer_usa.tif",
+    "path": "C:\\myproject\\Biomass predict\\sample_tiffs\\yellowstone_conifer_usa.tif",
+    "location": "Yellowstone National Park, Wyoming, USA",
+    "coordinates": "44.954\u00b0 N, 110.645\u00b0 W",
+    "crs": "EPSG:32612 (UTM Zone 12N)",
+    "ecosystem": "Temperate Coniferous Forest (Lodgepole Pine / Fir)",
+    "file_size": "21205.0 KB"
+  },
+  {
+    "filename": "california_sierra_soap.tif",
+    "path": "C:\\myproject\\Biomass predict\\sample_tiffs\\california_sierra_soap.tif",
+    "location": "Soaproot Saddle, Sierra National Forest, California, USA",
+    "coordinates": "37.031\u00b0 N, 119.261\u00b0 W",
+    "crs": "EPSG:32611 (UTM Zone 11N)",
+    "ecosystem": "Sierra Nevada Mixed Montane Conifer & Oak Woodland",
+    "file_size": "543.9 KB"
+  },
+  {
+    "filename": "bandipur_canopy_india.tif",
+    "path": "C:\\myproject\\Biomass predict\\sample_tiffs\\bandipur_canopy_india.tif",
+    "location": "Bandipur National Park, Karnataka, India",
+    "coordinates": "11.725\u00b0 N, 76.381\u00b0 E",
+    "crs": "EPSG:32643 (UTM Zone 43N)",
+    "ecosystem": "Tropical Moist & Dry Deciduous Canopy (Teak, Rosewood)",
+    "file_size": "10.63 MB"
+  }
+]

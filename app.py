@@ -3,10 +3,13 @@ FastAPI Application exposing Earth Engine Data Pipeline and Diagnostic Endpoints
 Phases 1-4: Satellite Data Acquisition, Biomass Estimation, Tree Detection, AOI Analysis.
 """
 
+import os
 from typing import Optional
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException, UploadFile, File, Form
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import config
 from config import GCP_PROJECT, ALL_STACK_BANDS, FEATURE_DESCRIPTIONS, DEMO_MODE
 from ee_service import verify_pipeline
 
@@ -288,18 +291,20 @@ async def upload_tree_detection_endpoint(
     score_thresh: Optional[float] = Form(None),
     conf: Optional[float] = Form(None),
     aoi_geojson: Optional[str] = Form(None),
+    map_bounds: Optional[str] = Form(None),
     demo: Optional[bool] = Form(False)
 ):
     """
-    Path A: Receives an uploaded high-resolution georeferenced RGB GeoTIFF,
-    validates spatial reference and image structure, runs DeepForest individual
-    tree-crown detection, and returns geographic tree predictions.
-    The uploaded imagery must be a real high-resolution (ideally < 1m/px) RGB GeoTIFF.
+    Path A: Receives an uploaded image (GeoTIFF, PNG, JPG, aerial/drone photo),
+    validates it, runs DeepForest individual tree-crown detection, and returns
+    geographic tree predictions positioned at the correct map location.
+    Non-georeferenced images are auto-placed at the current map viewport bounds.
     """
-    if not file.filename.lower().endswith((".tif", ".tiff", ".geotiff")):
+    allowed_extensions = (".tif", ".tiff", ".geotiff", ".png", ".jpg", ".jpeg", ".webp", ".bmp")
+    if not file.filename.lower().endswith(allowed_extensions):
         raise HTTPException(
             status_code=400,
-            detail="Unsupported file format. Please upload a georeferenced RGB GeoTIFF (.tif or .tiff)."
+            detail=f"Unsupported file format. Supported formats: {', '.join(allowed_extensions)}"
         )
 
     threshold = conf if conf is not None else score_thresh
@@ -315,6 +320,16 @@ async def upload_tree_detection_endpoint(
         except Exception:
             pass
 
+    # Parse map_bounds: [minLon, minLat, maxLon, maxLat] from the frontend map viewport
+    map_bbox = None
+    if map_bounds:
+        try:
+            parsed = json.loads(map_bounds)
+            if isinstance(parsed, list) and len(parsed) == 4:
+                map_bbox = [float(v) for v in parsed]
+        except Exception:
+            pass
+
     temp_dir = tempfile.mkdtemp(prefix="forest_tree_upload_")
     temp_file_path = os.path.join(temp_dir, f"upload_{file.filename}")
 
@@ -327,7 +342,8 @@ async def upload_tree_detection_endpoint(
             conf_thresh=threshold,
             force_demo=bool(demo),
             is_user_upload=True,
-            aoi_geometry=aoi_geom
+            aoi_geometry=aoi_geom,
+            map_bbox=map_bbox
         )
 
         if result.get("status") == "error":
@@ -365,6 +381,33 @@ def get_demo_tile_info(
     """
     meta = setup_neon_proxy_tile(force=bool(regenerate))
     return meta
+
+
+@app.get("/api/v1/trees/demo-tile/image", tags=["Tree Detection"])
+def get_demo_tile_image():
+    """
+    Returns the high-resolution RGB aerial image (PNG) of the NEON proxy tile
+    for direct Leaflet imageOverlay rendering.
+    """
+    png_path = os.path.join("data", "demo_highres", "neon_proxy_osbs.png")
+    if not os.path.exists(png_path):
+        tiff_path = config.HIGHRES_DEMO_TIFF
+        if os.path.exists(tiff_path):
+            try:
+                import rasterio
+                from PIL import Image
+                import numpy as np
+                with rasterio.open(tiff_path) as src:
+                    rgb = np.transpose(src.read([1, 2, 3]), (1, 2, 0))
+                    img = Image.fromarray(rgb.astype(np.uint8))
+                    os.makedirs(os.path.dirname(png_path), exist_ok=True)
+                    img.save(png_path)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to generate aerial image: {str(e)}")
+        else:
+            raise HTTPException(status_code=404, detail="NEON demo GeoTIFF not found.")
+    
+    return FileResponse(png_path, media_type="image/png")
 
 
 # =========================================================================

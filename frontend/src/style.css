@@ -1303,3 +1303,297 @@ body {
   color: var(--accent-amber);
   line-height: 1.4;
 }
+
+/* --------------------------------------------------------------------------
+   NEON Proxy — Compact Satellite Context Layer Picker
+   -------------------------------------------------------------------------- */
+.proxy-ee-layers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.proxy-layer-radio-card {
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+}
+
+.proxy-layer-radio-card input[type="radio"] {
+  display: none;
+}
+
+.proxy-layer-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 5px 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: all 0.18s ease;
+  text-align: center;
+  gap: 1px;
+}
+
+.proxy-layer-radio-card:hover .proxy-layer-card-content {
+  border-color: var(--accent-cyan);
+  background: rgba(6, 182, 212, 0.06);
+}
+
+.proxy-layer-radio-card input[type="radio"]:checked + .proxy-layer-card-content {
+  background: rgba(6, 182, 212, 0.12);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan-glow);
+}
+
+.proxy-layer-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.proxy-layer-sub {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.proxy-satellite-note {
+  font-size: 0.67rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  padding: 6px 8px;
+  background: rgba(6, 182, 212, 0.04);
+  border-left: 2px solid var(--accent-cyan);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-top: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   NEON Polygon Analysis Stats
+   -------------------------------------------------------------------------- */
+.neon-poly-stats {
+  margin-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+}
+
+.poly-stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.poly-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  transition: background 0.15s ease;
+}
+
+.poly-stat-row:nth-child(odd) {
+  background: rgba(6, 182, 212, 0.04);
+}
+
+.poly-stat-row:hover {
+  background: rgba(6, 182, 212, 0.08);
+}
+
+.poly-stat-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.poly-stat-val {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-main);
+  text-align: right;
+}
+
+.highlight-cyan-text {
+  color: var(--accent-cyan) !important;
+}
+
+/* --------------------------------------------------------------------------
+   NEON Site Boundary Tooltip (Leaflet tooltip override)
+   -------------------------------------------------------------------------- */
+.neon-boundary-tooltip {
+  background: var(--bg-glass) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(245, 158, 11, 0.2) !important;
+  padding: 6px 10px !important;
+  color: var(--text-main) !important;
+  font-family: var(--font-sans) !important;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.neon-boundary-tooltip::before {
+  border-top-color: rgba(245, 158, 11, 0.5) !important;
+}
+
+/* Leaflet tooltip arrow fix for dark theme */
+.leaflet-tooltip-top.neon-boundary-tooltip::before {
+  border-top-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+/* ============================================================
+   Uploaded Image Overlay Rendering
+   Ensure the uploaded aerial/drone image shows sharply and
+   that tree crown circles are always drawn above it.
+   ============================================================ */
+
+/* Uploaded image overlay: use crisp rendering for aerial imagery */
+.leaflet-image-layer {
+  image-rendering: auto;
+}
+
+/* SVG layer (where Leaflet circles live) must be above image overlays */
+.leaflet-pane.leaflet-overlay-pane {
+  z-index: 400 !important;
+}
+
+/* The uploaded image overlay sits at z-index 200, below the SVG circles */
+.leaflet-pane.leaflet-overlay-pane > canvas,
+.leaflet-pane.leaflet-overlay-pane > .leaflet-image-layer {
+  z-index: 200;
+}
+
+/* --------------------------------------------------------------------------
+   Layer View Mode Switcher (Both / Original Image / Blue Crowns Only)
+   -------------------------------------------------------------------------- */
+.layer-view-selector-section {
+  margin-top: 14px;
+  padding: 12px;
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.layer-view-title {
+  font-size: 0.73rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent-cyan);
+}
+
+.view-mode-btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.btn-view-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-view-mode .mode-icon {
+  font-size: 1rem;
+}
+
+.btn-view-mode .mode-name {
+  line-height: 1.1;
+}
+
+.btn-view-mode:hover {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--text-main);
+  border-color: rgba(6, 182, 212, 0.4);
+}
+
+.btn-view-mode.active {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3) 0%, rgba(16, 185, 129, 0.3) 100%);
+  border-color: var(--accent-cyan);
+  color: #ffffff;
+  box-shadow: 0 0 10px var(--accent-cyan-glow);
+  font-weight: 600;
+}
+
+/* Floating Top-Center View Toggle Bar */
+.map-floating-controls.top-center {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.view-toggle-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  border-radius: var(--radius-full);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(6, 182, 212, 0.2);
+}
+
+.view-toggle-bar .bar-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  padding: 2px 8px;
+  letter-spacing: 0.5px;
+  background: rgba(6, 182, 212, 0.15);
+  border-radius: var(--radius-full);
+  margin-right: 4px;
+}
+
+.map-view-toggle-btn {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.map-view-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+}
+
+.map-view-toggle-btn.active {
+  background: var(--accent-cyan);
+  color: #032b30;
+  font-weight: 700;
+  box-shadow: 0 0 12px var(--accent-cyan-glow);
+}

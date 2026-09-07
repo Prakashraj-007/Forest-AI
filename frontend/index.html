@@ -188,7 +188,7 @@
             </div>
           </div>
 
-          <!-- STEP 4: Execution & Dates -->
+          <!-- STEP 4: Biomass Estimation Model -->
           <div class="panel-card glass">
             <div class="card-header">
               <h3><span class="card-num">04</span> Biomass Estimation Model</h3>
@@ -310,7 +310,7 @@
           <!-- Detection Options Tabs -->
           <div class="tree-path-tabs">
             <button id="tab-path-upload" class="tree-sub-tab active">
-              <span>📤 Upload GeoTIFF</span>
+              <span>📤 Upload Image / GeoTIFF</span>
             </button>
             <button id="tab-path-provider" class="tree-sub-tab">
               <span>🛰️ Imagery Provider</span>
@@ -320,24 +320,23 @@
             </button>
           </div>
 
-          <!-- PATH A: Upload High-Res GeoTIFF -->
+          <!-- PATH A: Upload High-Res GeoTIFF / Image -->
           <div id="section-path-upload" class="tree-path-section active">
             <div class="panel-card glass">
               <div class="card-header">
-                <h3><span class="card-num">A</span> Upload High-Resolution RGB GeoTIFF</h3>
+                <h3><span class="card-num">A</span> Upload Aerial / Drone Image or GeoTIFF</h3>
                 <span class="card-badge">Custom Area</span>
               </div>
               <div class="card-body">
                 <p class="draw-instruction">
-                  Upload a real high-resolution aerial or drone GeoTIFF (.tif/.tiff) with embedded geospatial
-                  coordinates. DeepForest will detect tree crowns in your uploaded imagery.
+                  Upload any aerial image, drone capture, screenshot, or GeoTIFF (.tif, .png, .jpg). DeepForest will detect individual tree crowns in your uploaded imagery.
                 </p>
                 <div class="upload-dropzone" id="upload-dropzone">
-                  <input type="file" id="geotiff-file-input" accept=".tif,.tiff,.geotiff" class="file-input-hidden">
+                  <input type="file" id="geotiff-file-input" accept=".tif,.tiff,.geotiff,.png,.jpg,.jpeg,.webp,.bmp,image/*" class="file-input-hidden">
                   <div class="dropzone-content">
                     <span class="upload-icon">📁</span>
-                    <span class="dropzone-title">Click to select or drag & drop GeoTIFF</span>
-                    <span class="dropzone-sub">Supported: GeoTIFF (.tif, .tiff) with RGB channels</span>
+                    <span class="dropzone-title">Click to select or drag & drop Image</span>
+                    <span class="dropzone-sub">Supported: GeoTIFF (.tif, .tiff), PNG, JPG, Drone / Aerial Photos</span>
                     <span id="selected-file-name" class="selected-file-name hidden"></span>
                   </div>
                 </div>
@@ -353,7 +352,7 @@
 
                 <button id="btn-upload-detect" class="btn btn-primary btn-block" disabled>
                   <span class="btn-icon">🎯</span>
-                  <span class="btn-text">Run DeepForest on Uploaded GeoTIFF</span>
+                  <span class="btn-text">Run DeepForest on Uploaded Image</span>
                 </button>
               </div>
             </div>
@@ -447,6 +446,118 @@
                 </button>
               </div>
             </div>
+
+            <!-- NEON Context Satellite Layers (visual context only — NOT DeepForest inputs) -->
+            <div class="panel-card glass">
+              <div class="card-header">
+                <h3><span class="card-num">C2</span> Satellite Context Layers</h3>
+                <span class="card-badge">Visual Only</span>
+              </div>
+              <div class="card-body">
+                <div class="proxy-ee-layers-grid">
+                  <label class="proxy-layer-radio-card">
+                    <input type="radio" name="neon-ee-layer-select" id="neon-layer-none" value="none" checked>
+                    <span class="proxy-layer-card-content">
+                      <span class="proxy-layer-name">Base Map</span>
+                    </span>
+                  </label>
+                  <label class="proxy-layer-radio-card">
+                    <input type="radio" name="neon-ee-layer-select" id="neon-layer-aerial" value="aerial_highres">
+                    <span class="proxy-layer-card-content">
+                      <span class="proxy-layer-name">Aerial RGB</span>
+                      <span class="proxy-layer-sub">NEON 0.10m Ortho</span>
+                    </span>
+                  </label>
+                  <label class="proxy-layer-radio-card">
+                    <input type="radio" name="neon-ee-layer-select" id="neon-layer-s2-rgb" value="s2_rgb">
+                    <span class="proxy-layer-card-content">
+                      <span class="proxy-layer-name">S2 RGB</span>
+                      <span class="proxy-layer-sub">True Color (10m)</span>
+                    </span>
+                  </label>
+                  <label class="proxy-layer-radio-card">
+                    <input type="radio" name="neon-ee-layer-select" id="neon-layer-s2-ndvi" value="s2_ndvi">
+                    <span class="proxy-layer-card-content">
+                      <span class="proxy-layer-name">S2 NDVI</span>
+                      <span class="proxy-layer-sub">Vegetation Index</span>
+                    </span>
+                  </label>
+                  <label class="proxy-layer-radio-card">
+                    <input type="radio" name="neon-ee-layer-select" id="neon-layer-s1-vv" value="s1_vv">
+                    <span class="proxy-layer-card-content">
+                      <span class="proxy-layer-name">S1 VV</span>
+                      <span class="proxy-layer-sub">SAR Backscatter</span>
+                    </span>
+                  </label>
+                  <label class="proxy-layer-radio-card">
+                    <input type="radio" name="neon-ee-layer-select" id="neon-layer-s1-vh" value="s1_vh">
+                    <span class="proxy-layer-card-content">
+                      <span class="proxy-layer-name">S1 VH</span>
+                      <span class="proxy-layer-sub">Cross-Pol SAR</span>
+                    </span>
+                  </label>
+                  <label class="proxy-layer-radio-card">
+                    <input type="radio" name="neon-ee-layer-select" id="neon-layer-canopy" value="canopy_height">
+                    <span class="proxy-layer-card-content">
+                      <span class="proxy-layer-name">Canopy Ht</span>
+                      <span class="proxy-layer-sub">LiDAR (10m)</span>
+                    </span>
+                  </label>
+                </div>
+                <div id="neon-ee-layer-status" class="ee-layer-status hidden"></div>
+                <p class="proxy-satellite-note">
+                  🔬 <em>Satellite and canopy-height layers are provided for visual context only. Individual trees are
+                  detected from high-resolution RGB imagery using DeepForest.</em>
+                </p>
+              </div>
+            </div>
+
+            <!-- NEON Polygon Analysis Tool -->
+            <div class="panel-card glass" id="neon-polygon-card">
+              <div class="card-header">
+                <h3><span class="card-num">C3</span> NEON Polygon Analysis</h3>
+                <span class="card-badge highlight-amber" id="neon-polygon-badge">No Polygon</span>
+              </div>
+              <div class="card-body">
+                <p class="draw-instruction" style="margin-bottom: 8px;">
+                  Draw a polygon over the NEON site to analyse detected tree crowns within it. Run detection first.
+                </p>
+                <div class="draw-actions">
+                  <button id="btn-draw-neon-polygon" class="btn btn-outline btn-sm">
+                    ✏️ Draw Analysis Polygon
+                  </button>
+                  <button id="btn-clear-neon-polygon" class="btn btn-ghost btn-sm hidden">
+                    🗑️ Clear Polygon
+                  </button>
+                </div>
+
+                <!-- Polygon Statistics -->
+                <div id="neon-polygon-stats" class="neon-poly-stats hidden">
+                  <div class="poly-stats-grid">
+                    <div class="poly-stat-row">
+                      <span class="poly-stat-label">Confidence Range</span>
+                      <span class="poly-stat-val" id="poly-confidence-range">—</span>
+                    </div>
+                    <div class="poly-stat-row">
+                      <span class="poly-stat-label">Est. Crown Radius</span>
+                      <span class="poly-stat-val" id="poly-crown-radius-range">—</span>
+                    </div>
+                    <div class="poly-stat-row">
+                      <span class="poly-stat-label">Tree Count in Polygon</span>
+                      <span class="poly-stat-val highlight-cyan-text" id="poly-tree-count">—</span>
+                    </div>
+                    <div class="poly-stat-row">
+                      <span class="poly-stat-label">Est. Tree Density</span>
+                      <span class="poly-stat-val" id="poly-tree-density">—</span>
+                    </div>
+                    <div class="poly-stat-row">
+                      <span class="poly-stat-label">Polygon Area</span>
+                      <span class="poly-stat-val" id="poly-area-ha">—</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Loading Indicator for Tree Detection -->
@@ -500,12 +611,81 @@
                 </div>
               </div>
 
-              <div class="detection-options">
-                <label class="checkbox-label">
-                  <input type="checkbox" id="chk-show-boxes" checked>
-                  <span>Show Individual Crown Polygons / Circles</span>
+              <!-- Layer View Switcher (Original Image, Blue Crowns, Both) -->
+              <div class="layer-view-selector-section" id="tree-view-mode-container">
+                <span class="layer-view-title">👁️ Image & Crown Display Mode:</span>
+                <div class="view-mode-btn-group">
+                  <button type="button" class="btn-view-mode active" data-view-mode="both" id="btn-view-both" title="Show original image with blue tree crowns on top">
+                    <span class="mode-icon">🔲</span>
+                    <span class="mode-name">Both (Overlay)</span>
+                  </button>
+                  <button type="button" class="btn-view-mode" data-view-mode="image" id="btn-view-image" title="Show original uploaded aerial image only">
+                    <span class="mode-icon">🖼️</span>
+                    <span class="mode-name">Original Image</span>
+                  </button>
+                  <button type="button" class="btn-view-mode" data-view-mode="crowns" id="btn-view-crowns" title="Show blue tree crown circles only">
+                    <span class="mode-icon">⭕</span>
+                    <span class="mode-name">Blue Crowns</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 03: Satellite Context (Sentinel-1 & Sentinel-2 Earth Engine Layers) -->
+          <div class="panel-card glass" id="tree-ee-layers-card" style="margin-top: 14px;">
+            <div class="card-header">
+              <h3><span class="card-num">03</span> Satellite Context (Sentinel-1 & 2)</h3>
+              <span class="card-badge highlight-cyan">Earth Engine</span>
+            </div>
+            <div class="card-body">
+              <p class="draw-instruction" style="margin-bottom: 8px;">
+                Overlay live Copernicus Sentinel-1 radar and Sentinel-2 optical imagery for the active area:
+              </p>
+              <div class="proxy-ee-layers-grid">
+                <label class="proxy-layer-radio-card">
+                  <input type="radio" name="upload-ee-layer-select" value="none" checked>
+                  <span class="proxy-layer-card-content">
+                    <span class="proxy-layer-name">Base Map</span>
+                  </span>
+                </label>
+                <label class="proxy-layer-radio-card">
+                  <input type="radio" name="upload-ee-layer-select" value="s2_rgb">
+                  <span class="proxy-layer-card-content">
+                    <span class="proxy-layer-name">Sentinel-2 RGB</span>
+                    <span class="proxy-layer-sub">Optical (10m)</span>
+                  </span>
+                </label>
+                <label class="proxy-layer-radio-card">
+                  <input type="radio" name="upload-ee-layer-select" value="s2_ndvi">
+                  <span class="proxy-layer-card-content">
+                    <span class="proxy-layer-name">Sentinel-2 NDVI</span>
+                    <span class="proxy-layer-sub">Vegetation Index</span>
+                  </span>
+                </label>
+                <label class="proxy-layer-radio-card">
+                  <input type="radio" name="upload-ee-layer-select" value="s1_vv">
+                  <span class="proxy-layer-card-content">
+                    <span class="proxy-layer-name">Sentinel-1 VV</span>
+                    <span class="proxy-layer-sub">SAR Radar (dB)</span>
+                  </span>
+                </label>
+                <label class="proxy-layer-radio-card">
+                  <input type="radio" name="upload-ee-layer-select" value="s1_vh">
+                  <span class="proxy-layer-card-content">
+                    <span class="proxy-layer-name">Sentinel-1 VH</span>
+                    <span class="proxy-layer-sub">SAR Cross-Pol</span>
+                  </span>
+                </label>
+                <label class="proxy-layer-radio-card">
+                  <input type="radio" name="upload-ee-layer-select" value="canopy_height">
+                  <span class="proxy-layer-card-content">
+                    <span class="proxy-layer-name">Canopy Height</span>
+                    <span class="proxy-layer-sub">ETH Global (10m)</span>
+                  </span>
                 </label>
               </div>
+              <div id="upload-ee-layer-status" class="ee-layer-status hidden" style="margin-top: 8px;"></div>
             </div>
           </div>
         </div>
@@ -514,6 +694,22 @@
       <!-- Center & Right: Interactive Leaflet Map Canvas -->
       <main class="map-container" id="map-container">
         <div id="leaflet-map" class="map-view"></div>
+
+        <!-- Floating Map Overlay View Mode Bar (Appears when Image Overlay is active) -->
+        <div class="map-floating-controls top-center" id="map-overlay-view-bar" style="display: none;">
+          <div class="map-control-group glass view-toggle-bar">
+            <span class="bar-tag">LAYER VIEW</span>
+            <button class="map-view-toggle-btn active" data-view-mode="both" title="Show both image and detection crowns">
+              🔲 Both (Image + Crowns)
+            </button>
+            <button class="map-view-toggle-btn" data-view-mode="image" title="Show original aerial image only">
+              🖼️ Original Image
+            </button>
+            <button class="map-view-toggle-btn" data-view-mode="crowns" title="Show blue crown circles only">
+              ⭕ Blue Crowns
+            </button>
+          </div>
+        </div>
 
         <!-- Floating Map Controls (Top Right) -->
         <div class="map-floating-controls top-right">

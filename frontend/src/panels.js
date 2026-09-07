@@ -62,6 +62,14 @@ export class DashboardPanels {
     this.legendGradientBar = document.getElementById('legend-gradient-bar');
     this.legendTicks = document.getElementById('legend-ticks');
     this.legendAdditional = document.getElementById('legend-additional-items');
+
+    // NEON Polygon Analysis stats elements
+    this.neonPolygonStats = document.getElementById('neon-polygon-stats');
+    this.polyConfidenceRange = document.getElementById('poly-confidence-range');
+    this.polyCrownRadiusRange = document.getElementById('poly-crown-radius-range');
+    this.polyTreeCount = document.getElementById('poly-tree-count');
+    this.polyTreeDensity = document.getElementById('poly-tree-density');
+    this.polyAreaHa = document.getElementById('poly-area-ha');
   }
 
   setBackendStatus(status) {
@@ -386,6 +394,112 @@ export class DashboardPanels {
       this.legendTitle.textContent = 'Biomass Density (Mg/ha)';
       this.legendGradientBar.style.background = 'linear-gradient(90deg, #064e3b 0%, #10b981 40%, #eab308 75%, #ef4444 100%)';
       this.legendTicks.innerHTML = '<span>0</span><span>75</span><span>150</span><span>225</span><span>300+</span>';
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // NEON Polygon Analysis Stats
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Populate the polygon statistics panel with computed values and sync results card.
+   * @param {Object} stats                  Output of ForestMap.computeNeonPolygonStats()
+   * @param {boolean} [noDetections]        True when no detection run has been performed yet
+   * @param {number} [totalDetectionsCount] Total detections in the whole tile
+   */
+  renderNeonPolygonStats(stats, noDetections = false, totalDetectionsCount = 0) {
+    if (!this.neonPolygonStats) return;
+    this.neonPolygonStats.classList.remove('hidden');
+
+    const { count, areaHa, densityPerHa, confidenceMin, confidenceMax,
+            crownRadiusMin, crownRadiusMax } = stats;
+
+    if (noDetections) {
+      if (this.polyTreeCount) this.polyTreeCount.textContent = '—';
+      if (this.polyTreeDensity) this.polyTreeDensity.textContent = '—';
+      if (this.polyAreaHa) this.polyAreaHa.textContent = areaHa > 0 ? `${areaHa.toFixed(3)} ha` : '—';
+      if (this.polyConfidenceRange) this.polyConfidenceRange.textContent = '—';
+      if (this.polyCrownRadiusRange) this.polyCrownRadiusRange.textContent = '—';
+
+      let hintEl = document.getElementById('poly-no-detection-hint');
+      if (!hintEl) {
+        hintEl = document.createElement('p');
+        hintEl.id = 'poly-no-detection-hint';
+        hintEl.style.cssText = 'font-size:0.67rem;color:var(--accent-amber);margin-top:6px;padding:4px 8px;border-left:2px solid var(--accent-amber);';
+        this.neonPolygonStats.appendChild(hintEl);
+      }
+      hintEl.textContent = '⚡ Run NEON Proxy Detection first — then polygon stats will show tree counts inside your polygon.';
+      hintEl.style.display = 'block';
+      return;
+    }
+
+    const hintEl = document.getElementById('poly-no-detection-hint');
+    if (hintEl) hintEl.style.display = 'none';
+
+    if (this.polyTreeCount) {
+      this.polyTreeCount.innerHTML = `<strong>${count}</strong> <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(of ${totalDetectionsCount || count} in tile)</span>`;
+    }
+
+    if (this.polyTreeDensity) {
+      this.polyTreeDensity.textContent = count > 0
+        ? `${densityPerHa.toFixed(1)} trees / ha`
+        : '0 trees / ha';
+    }
+
+    if (this.polyAreaHa) {
+      this.polyAreaHa.textContent = areaHa > 0
+        ? `${areaHa.toFixed(3)} ha`
+        : '—';
+    }
+
+    if (this.polyConfidenceRange) {
+      if (confidenceMin !== null && confidenceMax !== null) {
+        this.polyConfidenceRange.textContent =
+          `${confidenceMin.toFixed(3)} – ${confidenceMax.toFixed(3)}`;
+      } else {
+        this.polyConfidenceRange.textContent = '—';
+      }
+    }
+
+    if (this.polyCrownRadiusRange) {
+      if (crownRadiusMin !== null && crownRadiusMax !== null) {
+        this.polyCrownRadiusRange.textContent =
+          `${crownRadiusMin.toFixed(2)} – ${crownRadiusMax.toFixed(2)} m`;
+      } else {
+        this.polyCrownRadiusRange.textContent = '—';
+      }
+    }
+
+    // Sync results card with active polygon count
+    if (this.treeCountBadge && totalDetectionsCount > 0) {
+      this.treeCountBadge.textContent = `${count} / ${totalDetectionsCount} Trees (In Polygon)`;
+    }
+    if (this.resTreeCount && totalDetectionsCount > 0) {
+      this.resTreeCount.textContent = count;
+    }
+    if (this.resTreeDensity && totalDetectionsCount > 0 && areaHa > 0) {
+      this.resTreeDensity.textContent = `${Math.round(densityPerHa)}`;
+    }
+  }
+
+  /**
+   * Reset all polygon statistics to their initial empty state and restore full results.
+   */
+  clearNeonPolygonStats(totalDetectionsCount = 0) {
+    if (this.neonPolygonStats) {
+      this.neonPolygonStats.classList.add('hidden');
+    }
+    if (this.polyConfidenceRange) this.polyConfidenceRange.textContent = '—';
+    if (this.polyCrownRadiusRange) this.polyCrownRadiusRange.textContent = '—';
+    if (this.polyTreeCount) this.polyTreeCount.textContent = '—';
+    if (this.polyTreeDensity) this.polyTreeDensity.textContent = '—';
+    if (this.polyAreaHa) this.polyAreaHa.textContent = '—';
+
+    // Restore full results display
+    if (totalDetectionsCount > 0) {
+      if (this.treeCountBadge) this.treeCountBadge.textContent = `${totalDetectionsCount} Trees Detected`;
+      if (this.resTreeCount) this.resTreeCount.textContent = totalDetectionsCount;
+      if (this.resTreeDensity) this.resTreeDensity.textContent = Math.round(totalDetectionsCount / 0.16);
     }
   }
 }
